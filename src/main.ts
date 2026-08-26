@@ -4,15 +4,15 @@ import {
   ExpressAdapter,
   NestExpressApplication,
 } from '@nestjs/platform-express';
+import { InternalDisabledLogger } from '@common/libs/pino/internal.logger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
     new ExpressAdapter(),
-
     {
       snapshot: true,
-      logger: new InternalDisabledLogger(),
+      //  logger: new InternalDisabledLogger(),
     },
   );
 
