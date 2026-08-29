@@ -1,10 +1,10 @@
 import process from 'node:process';
 import { ConfigType, registerAs } from '@nestjs/config';
 import Joi from 'joi';
-import { APP_ENVIRONMENTS } from '../envs';
+import { APP_ENVIRONMENTS } from '../envs.js';
 
 // validation schema
-export const mainConfigValidationSchema = {
+export const appConfigValidationSchema = {
   NODE_ENV: Joi.string()
     .valid(...APP_ENVIRONMENTS)
     .required(),
@@ -18,7 +18,7 @@ export const mainConfigValidationSchema = {
 };
 
 // config
-export const mainConfig = registerAs('app', () => ({
+export const appConfig = registerAs('app', () => ({
   port: process.env.APP_PORT,
   prefix: process.env.APP_PREFIX,
   env: process.env.NODE_ENV,
@@ -32,4 +32,4 @@ export const mainConfig = registerAs('app', () => ({
   },
 }));
 
-export type Main = ConfigType<typeof mainConfig>;
+export type AppConfigs = ConfigType<typeof appConfig>;

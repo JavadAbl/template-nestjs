@@ -1,5 +1,5 @@
 import process from 'node:process';
-import { registerAs } from '@nestjs/config';
+import { ConfigType, registerAs } from '@nestjs/config';
 import Joi from 'joi';
 
 export const databaseConfigValidationSchema = {
@@ -17,3 +17,5 @@ export const databaseConfig = registerAs('database', () => ({
   user: process.env.DB_USERNAME,
   dbName: process.env.DB_DATABASE,
 }));
+
+export type DatabaseConfigs = ConfigType<typeof databaseConfig>;

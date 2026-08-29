@@ -2,11 +2,11 @@ import process from 'node:process';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import Joi from 'joi';
-import { appConfig, appConfigValidationSchema } from './configs/app.config';
 import {
   databaseConfig,
   databaseConfigValidationSchema,
-} from './configs/database.config';
+} from './configs/database.config.js';
+import { appConfig, appConfigValidationSchema } from './configs/app.config.js';
 
 @Module({
   imports: [
@@ -21,10 +21,12 @@ import {
         ...databaseConfigValidationSchema,
       }),
       validationOptions: {
-        libraryOptions: { abortEarly: true },
-        cache: !AppConfigModule.isProd(),
-        debug: !AppConfigModule.isProd(),
-        stack: !AppConfigModule.isProd(),
+        libraryOptions: {
+          abortEarly: true,
+          cache: !AppConfigModule.isProd(),
+          debug: !AppConfigModule.isProd(),
+          stack: !AppConfigModule.isProd(),
+        },
       },
     }),
   ],
@@ -34,5 +36,9 @@ import {
 export class AppConfigModule {
   public static isProd(): boolean {
     return process?.env?.NODE_ENV?.startsWith('prod') ?? false;
+  }
+
+  public static isDev(): boolean {
+    return process?.env?.NODE_ENV?.startsWith('dev') ?? true;
   }
 }
