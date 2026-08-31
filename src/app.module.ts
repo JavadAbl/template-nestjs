@@ -1,10 +1,45 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
+import { LoggerModule } from 'nestjs-pino';
+import { getLoggerAsyncConfig } from '@common/libs/pino/pino.config.js';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  appConfig,
+  appConfigValidationSchema,
+} from '@common/config/configs/app.config.js';
+import {
+  databaseConfig,
+  databaseConfigValidationSchema,
+} from '@common/config/configs/database.config.js';
+import Joi from 'joi';
+import { I18nModule } from 'nestjs-i18n';
+import { getI18nConfig } from '@common/libs/i18n/i18n.config.js';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [appConfig, databaseConfig],
+      validationSchema: Joi.object({
+        ...appConfigValidationSchema,
+        ...databaseConfigValidationSchema,
+      }),
+      validationOptions: {
+        libraryOptions: {
+          allowUnknown: true, // Allows variables not defined in schema
+          abortEarly: true, // Stops validation on the first error
+        },
+      },
+    }),
+
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: getLoggerAsyncConfig,
+    }),
+
+    I18nModule.forRoot(getI18nConfig()),
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
