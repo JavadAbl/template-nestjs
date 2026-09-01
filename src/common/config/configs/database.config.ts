@@ -3,19 +3,13 @@ import { ConfigType, registerAs } from '@nestjs/config';
 import Joi from 'joi';
 
 export const databaseConfigValidationSchema = {
-  DB_HOST: Joi.string().required(),
-  DB_PORT: Joi.number().port().required(),
-  DB_USERNAME: Joi.string().required(),
-  DB_PASSWORD: Joi.string().required(),
-  DB_DATABASE: Joi.string().required(),
+  DATABASE_URL: Joi.string().required(),
+  DATABASE_NAME: Joi.string().required(),
 };
 
 export const databaseConfig = registerAs('database', () => ({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  password: process.env.DB_PASSWORD,
-  user: process.env.DB_USERNAME,
-  dbName: process.env.DB_DATABASE,
+  DATABASE_URL: process.env.DB_HOST,
+  DATABASE_NAME: process.env.DB_HOST,
 }));
 
 export type DatabaseConfigs = ConfigType<typeof databaseConfig>;

@@ -1,9 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import {
-  ExpressAdapter,
-  NestExpressApplication,
-} from '@nestjs/platform-express';
+import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
 import { AppConfigModule } from '@common/config/config.module.js';
 import { setupSwagger } from '@common/libs/swagger/swagger.js';
 import { ConfigService } from '@nestjs/config';
@@ -11,28 +8,24 @@ import compression from 'compression';
 import helmet from 'helmet';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { Configs } from '@common/config/config.type.js';
-import {
-  i18nValidationErrorFactory,
-  I18nValidationExceptionFilter,
-} from 'nestjs-i18n';
-import { useContainer } from 'class-validator';
+import { i18nValidationErrorFactory, I18nValidationExceptionFilter } from 'nestjs-i18n';
 import chalk from 'chalk';
 
-declare const module: {
-  hot: { accept: () => void; dispose: (argument: () => Promise<void>) => void };
-};
+declare const module: { hot: { accept: () => void; dispose: (argument: () => Promise<void>) => void } };
 
 const logger = new Logger('Bootstrap');
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-    new ExpressAdapter(),
-    {
-      snapshot: true,
-      //  logger: new InternalDisabledLogger(),
-    },
-  );
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {
+    snapshot: true,
+    bufferLogs: true,
+    //  logger: new InternalDisabledLogger(),
+  });
+
+  // =========================================================
+  // Replace the default NestJS logger with Pino
+  // =========================================================
+  app.useLogger(app.get(Logger));
 
   app.set('query parser', 'extended');
 
@@ -72,9 +65,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(
-    new I18nValidationExceptionFilter({ detailedErrors: false }),
-  );
+  app.useGlobalFilters(new I18nValidationExceptionFilter({ detailedErrors: false }));
 
   // =========================================================
   // configure shutdown hooks
@@ -90,15 +81,14 @@ async function bootstrap() {
     await gracefulShutdown(app, 'SIGTERM');
   });
 
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  // useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   if (module?.hot) {
     module.hot.accept();
     module.hot.dispose(async () => app.close());
   }
 
-  const port =
-    process.env.PORT ?? configService.get('app.port', { infer: true })!;
+  const port = process.env.PORT ?? configService.get('app.port', { infer: true })!;
 
   await app.listen(port);
 

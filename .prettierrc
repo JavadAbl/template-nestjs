@@ -1,4 +1,7 @@
 {
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "objectWrap": "collapse",
+  "proseWrap": "preserve",
+  "printWidth": 110
 }

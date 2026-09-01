@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { PrismaProvider } from 'src/infrastructure-modules/prsima-module/prisma.provider';
+import { PrismaProvider } from './prisma.provider.js';
 
 @Global()
 @Module({ imports: [], providers: [PrismaProvider], exports: [PrismaProvider] })

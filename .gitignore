@@ -3,6 +3,11 @@
 /node_modules
 /build
 
+
+**/generated/prisma
+*.db
+*.zip
+
 # Logs
 logs
 *.log

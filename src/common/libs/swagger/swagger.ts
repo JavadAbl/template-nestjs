@@ -1,4 +1,3 @@
-import { AppConfig } from '@common/config/config.type.js';
 import {
   SWAGGER_API_CURRENT_VERSION,
   SWAGGER_API_ENDPOINT,
@@ -9,10 +8,11 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { swaggerOptions } from './swagger.plugin.js';
+import { Configs } from '@common/config/config.type.js';
 
 export function setupSwagger(
   app: INestApplication,
-  configService: ConfigService<AppConfig, true>,
+  configService: ConfigService<Configs, true>,
 ) {
   const options = new DocumentBuilder()
     .setTitle(SWAGGER_TITLE)

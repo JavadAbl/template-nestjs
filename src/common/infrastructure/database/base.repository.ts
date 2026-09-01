@@ -1,6 +1,6 @@
-import { Prisma, PrismaClient } from 'src/generated/prisma/client';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaProvider } from './prisma.provider.js';
+import { Prisma, PrismaClient } from './generated/prisma/client.js';
 
 export class Repository<TModel extends keyof PrismaClient> {
   constructor(
@@ -18,9 +18,7 @@ export class Repository<TModel extends keyof PrismaClient> {
 
   // --- READ ---
 
-  async findMany<
-    TArgs extends Prisma.Args<(typeof this.prismaProvider)[TModel], 'findMany'>,
-  >(
+  async findMany<TArgs extends Prisma.Args<(typeof this.prismaProvider)[TModel], 'findMany'>>(
     args?: TArgs,
   ): Promise<{
     items: Prisma.Result<PrismaClient[TModel], TArgs, 'findMany'>;
@@ -40,9 +38,7 @@ export class Repository<TModel extends keyof PrismaClient> {
     return await (this.prismaProvider[this.model] as any).findMany(args);
   } */
 
-  async findUnique<
-    TArgs extends Prisma.Args<PrismaClient[TModel], 'findUnique'>,
-  >(
+  async findUnique<TArgs extends Prisma.Args<PrismaClient[TModel], 'findUnique'>>(
     args: TArgs,
   ): Promise<Prisma.Result<PrismaClient[TModel], TArgs, 'findUnique'> | null> {
     return await (this.prismaProvider[this.model] as any).findUnique(args);
@@ -60,45 +56,31 @@ export class Repository<TModel extends keyof PrismaClient> {
     return await this.findFirst(args);
   }
 
-  async findAndCheckExistsBy<
-    TArgs extends Prisma.Args<PrismaClient[TModel], 'findFirst'>,
-  >(
+  async findAndCheckExistsBy<TArgs extends Prisma.Args<PrismaClient[TModel], 'findFirst'>>(
     args: TArgs,
     fieldName: string | null,
     value: any,
     customMessage?: string,
-  ): Promise<
-    NonNullable<Prisma.Result<PrismaClient[TModel], TArgs, 'findFirst'>>
-  > {
-    const entity = await (this.prismaProvider[this.model] as any).findFirst(
-      args,
-    );
+  ): Promise<NonNullable<Prisma.Result<PrismaClient[TModel], TArgs, 'findFirst'>>> {
+    const entity = await (this.prismaProvider[this.model] as any).findFirst(args);
     if (!entity) {
       throw new NotFoundException(
-        customMessage
-          ? customMessage
-          : `${this.entityName} ${fieldName} with value ${value} not found`,
+        customMessage ? customMessage : `${this.entityName} ${fieldName} with value ${value} not found`,
       );
     }
     return entity;
   }
 
-  async checkDuplicateBy<
-    TArgs extends Prisma.Args<PrismaClient[TModel], 'findFirst'>,
-  >(
+  async checkDuplicateBy<TArgs extends Prisma.Args<PrismaClient[TModel], 'findFirst'>>(
     args: TArgs,
     fieldName: string | null,
     value: any,
     customMessage?: string,
   ): Promise<void> {
-    const entity = await (this.prismaProvider[this.model] as any).findFirst(
-      args,
-    );
+    const entity = await (this.prismaProvider[this.model] as any).findFirst(args);
     if (entity)
       throw new ConflictException(
-        customMessage
-          ? customMessage
-          : `${this.entityName} ${fieldName} with value ${value} already exists`,
+        customMessage ? customMessage : `${this.entityName} ${fieldName} with value ${value} already exists`,
       );
   }
 
@@ -116,9 +98,7 @@ export class Repository<TModel extends keyof PrismaClient> {
     return await (this.prismaProvider[this.model] as any).update(args);
   }
 
-  async updateMany<
-    TArgs extends Prisma.Args<PrismaClient[TModel], 'updateMany'>,
-  >(
+  async updateMany<TArgs extends Prisma.Args<PrismaClient[TModel], 'updateMany'>>(
     args: TArgs,
   ): Promise<Prisma.Result<PrismaClient[TModel], TArgs, 'updateMany'>> {
     return await (this.prismaProvider[this.model] as any).updateMany(args);
@@ -137,9 +117,7 @@ export class Repository<TModel extends keyof PrismaClient> {
     return await (this.prismaProvider[this.model] as any).delete(args);
   }
 
-  async count<TArgs extends Prisma.Args<PrismaClient[TModel], 'count'>>(
-    args?: TArgs,
-  ): Promise<number> {
+  async count<TArgs extends Prisma.Args<PrismaClient[TModel], 'count'>>(args?: TArgs): Promise<number> {
     return await (this.prismaProvider[this.model] as any).count(args);
   }
 }

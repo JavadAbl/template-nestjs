@@ -1,5 +1,5 @@
-import { Prisma } from 'src/generated/prisma/client';
-import { GetManyQueryType } from '../dto/request/get-many-query';
+import { GetManyQueryType } from '@common/dto/request/get-many-query.js';
+import { Prisma } from '@common/infrastructure/database/generated/prisma/client.js';
 
 /**
  * Builds Prisma findMany arguments based on query criteria.
@@ -44,37 +44,3 @@ export function buildFindManyArgs<T extends keyof Prisma.TypeMap['model']>(
 
   return args;
 }
-
-/* 
-//Old Version--------------------------------------------------------------------
-import { Prisma } from "@prisma/client";
-import { GetManyRequestQuery } from "../schemas/common/get-many-request.schema.js";
-
-export function buildFindManyArgs<T extends keyof Prisma.TypeMap["model"]>(
-  criteria: GetManyRequestQuery,
-  options?: {
-    searchableFields?: string[]; // ✅ simpler and flexible
-  },
-): Prisma.TypeMap["model"][T]["operations"]["findMany"]["args"] {
-  // Default page is now 1 (first page)
-  const { page = 1, pageSize = 10, sortBy, sortOrder = "asc", search } = criteria;
-
-  // Guard against a zero or negative page value – treat it as the first page
-  const safePage = Math.max(page, 1);
-
-  const args: Prisma.TypeMap["model"][T]["operations"]["findMany"]["args"] = {
-    skip: (safePage - 1) * pageSize,
-    take: Math.min(pageSize, 100),
-  };
-
-  if (sortBy) {
-    args.orderBy = { [sortBy]: sortOrder };
-  }
-
-  if (search && options?.searchableFields?.length) {
-    args.where = { OR: options.searchableFields.map((field) => ({ [field]: { contains: search } })) };
-  }
-
-  return args;
-}
- */
