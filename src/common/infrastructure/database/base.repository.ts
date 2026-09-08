@@ -32,11 +32,6 @@ export class Repository<TModel extends keyof PrismaClient> {
     return { totalCount, items };
   }
 
-  /*  async findMany<TArgs extends Prisma.Args<PrismaClient[TModel], 'findMany'>>(
-    args?: TArgs,
-  ): Promise<Prisma.Result<PrismaClient[TModel], TArgs, 'findMany'>> {
-    return await (this.prismaProvider[this.model] as any).findMany(args);
-  } */
 
   async findUnique<TArgs extends Prisma.Args<PrismaClient[TModel], 'findUnique'>>(
     args: TArgs,
