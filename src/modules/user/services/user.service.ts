@@ -41,4 +41,10 @@ export class UserService {
     await this.userRep.findAndCheckExistsBy({ where: { name } }, 'name', name);
     await this.userRep.update({ data: payload, where: { id: userId } });
   }
+
+  async userDelete(userId: number, payload: UserUpdateDto): Promise<void> {
+    const { name } = payload;
+    await this.userRep.findAndCheckExistsBy({ where: { name } }, 'name', name);
+    await this.userRep.remove({ data: payload, where: { id: userId } });
+  }
 }

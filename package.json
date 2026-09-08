@@ -74,7 +74,13 @@
     "better-sqlite3@12.11.1": true
   },
   "imports": {
-    "#common/*": "./dist/common/*",
-    "#modules/*": "./dist/modules/*"
+    "#common/*": {
+      "types": "./src/common/*",
+      "default": "./dist/common/*"
+    },
+    "#modules/*": {
+      "types": "./src/modules/*",
+      "default": "./dist/modules/*"
+    }
   }
 }

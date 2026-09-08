@@ -8,8 +8,9 @@ import helmet from 'helmet';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { i18nValidationErrorFactory, I18nValidationExceptionFilter } from 'nestjs-i18n';
 import chalk from 'chalk';
-import { Configs } from '#common/config/config.type.js';
 import { AppConfigs, isDev, isProd } from '#common/config/configs/app.config.js';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Configs } from '#common/config/config.type.js';
 
 const logger = new Logger('Bootstrap');
 
@@ -32,8 +33,18 @@ async function bootstrap() {
   // =========================================================
   // configure swagger
   // =========================================================
+  if (!isProd()) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('My API')
+      .setDescription('API documentation for my NestJS app')
+      .setVersion('1.0')
+      .addTag('cats')
+      .addBearerAuth() // if you use JWT auth
+      .build();
 
-  // if (!isProd()) setupSwagger(app, configService);
+    const documentFactory = () => SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, documentFactory);
+  }
 
   // ======================================================
   // security and middlewares
