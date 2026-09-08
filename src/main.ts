@@ -16,15 +16,8 @@ const logger = new Logger('Bootstrap');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {
-    // snapshot: true,
     bufferLogs: true,
-    //  logger: new InternalDisabledLogger(),
   });
-
-  // =========================================================
-  // Replace the default NestJS logger with Pino
-  // =========================================================
-  // app.useLogger(app.get(Logger));
 
   app.set('query parser', 'extended');
 
