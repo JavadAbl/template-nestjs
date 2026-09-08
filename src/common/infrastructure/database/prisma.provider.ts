@@ -8,7 +8,7 @@ import { Configs } from '#common/config/config.type.js';
 @Injectable({ scope: Scope.DEFAULT })
 export class PrismaProvider extends PrismaClient {
   constructor(configService: ConfigService<Configs>) {
-    const config = configService.getOrThrow<DatabaseConfigs>('app');
+    const config = configService.getOrThrow<DatabaseConfigs>('database');
 
     const adapter = new PrismaBetterSqlite3({ url: config.DATABASE_URL });
 

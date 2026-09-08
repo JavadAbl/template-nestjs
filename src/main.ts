@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
-import { setupSwagger } from '#common/libs/swagger/swagger.js';
 import { ConfigService } from '@nestjs/config';
 import compression from 'compression';
 import helmet from 'helmet';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
-import { i18nValidationErrorFactory, I18nValidationExceptionFilter } from 'nestjs-i18n';
+import { Logger as PinoLogger } from 'nestjs-pino';
+import { i18nValidationErrorFactory } from 'nestjs-i18n';
 import chalk from 'chalk';
 import { AppConfigs, isDev, isProd } from '#common/config/configs/app.config.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -19,6 +19,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  app.useLogger(app.get(PinoLogger));
   app.set('query parser', 'extended');
 
   const configService = app.get(ConfigService<Configs, true>);
