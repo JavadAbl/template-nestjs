@@ -1,0 +1,46 @@
+# Variant for an externally-managed database server (we only connect to it).
+#   docker compose -f compose.external-db.yml up -d --build
+#
+# Differences from compose.yml:
+#   - No database volume: the data lives on the DB server, not in this container.
+#   - No prisma db push on boot: we don't own the schema; the DB team/CI migrates it.
+#   - DATABASE_URL points at the server (example below is SQL Server —
+#     match it to whichever adapter prisma.provider.ts activates).
+#   - restart: unless-stopped covers the case where the DB is briefly
+#     unreachable at boot: the container exits and Docker retries.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.external-db
+    image: template-nestjs-external-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      APP_PORT: 3000
+      # Connection string for the external server — set host/credentials per environment.
+      # Example for SQL Server (via @prisma/adapter-mssql):
+      DATABASE_URL: "sqlserver://dbuser:${DB_PASSWORD}@sqlserver.example.internal:1433/app?encrypt=true&trustServerCertificate=false"
+      # Example for Postgres (via @prisma/adapter-pg):
+      # DATABASE_URL: "postgresql://dbuser:${DB_PASSWORD}@postgres.example.internal:5432/app"
+      # Production logging defaults (override in .env if needed)
+      LOG_PRETTY: "false"
+      LOG_CONSOLE: "true"
+      LOG_FILE_ENABLED: "true"
+      # Relative to /app; the pino-roll transport joins it with process.cwd()
+      LOG_DIR: logs
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      # Logs still go to the host; there is no data volume to mount
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/Users').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      # Longer start period: connecting to a remote server can take longer than a local file
+      start_period: 40s

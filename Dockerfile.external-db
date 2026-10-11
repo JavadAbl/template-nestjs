@@ -1,0 +1,42 @@
+# ---------- Build stage ----------
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+# allowScripts is honored by npm when copying the package.json,
+# so native deps (better-sqlite3, prisma engines) build correctly
+RUN npm ci
+
+COPY . .
+
+# Generate the Prisma client into src/common/infrastructure/database/generated/prisma
+RUN npx prisma generate
+
+RUN npm run build
+
+# Prune dev dependencies for the runtime image.
+# No prisma CLI kept: schema/migrations are NOT applied by this container —
+# the external database server is owned and migrated by someone else.
+RUN npm prune --omit=dev
+
+# ---------- Runtime stage ----------
+FROM node:24-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# dumb-init gives proper signal handling / zombie reaping
+RUN apk add --no-cache dumb-init
+
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/package.json ./package.json
+
+USER node
+
+EXPOSE 3000
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["node", "dist/main"]
